@@ -47,6 +47,7 @@ Examples:
 /check perf note warning 5% slower than baseline
 /check list
 ```
+Put several commands in one comment, one per line; other lines are ignored.
 Only owners, members and collaborators can use these. `/checks` is accepted as an alias.
 """
 
@@ -103,11 +104,10 @@ class NotACommand(Exception):
     """Comment merely starts with /check (e.g. `/checkout`); ignore it silently."""
 
 
-def parse(body):
-    """Return (id, cmd, args). Raises ValueError with a user-facing message,
-    or NotACommand if the comment isn't a /check command at all."""
-    first = body.strip().splitlines()[0] if body.strip() else ""
-    m = re.match(r"^/checks?(?:\s+(.*))?$", first)
+def parse(line):
+    """Parse one line into (id, cmd, args). Raises ValueError with a user-facing
+    message, or NotACommand if the line isn't a /check command at all."""
+    m = re.match(r"^/checks?(?:\s+(.*))?$", line.strip())
     if not m:
         raise NotACommand()
     toks = (m.group(1) or "").split()
