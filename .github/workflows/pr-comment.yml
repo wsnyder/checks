@@ -1,0 +1,24 @@
+name: pr-comment
+on:
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  update-check:
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/check') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      # Default-branch checkout only; PR code is never checked out or run.
+      - uses: actions/checkout@v4
+      - run: python3 scripts/on_comment.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
